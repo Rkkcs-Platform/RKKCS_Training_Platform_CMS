@@ -3,6 +3,7 @@ import { onMounted, ref } from 'vue'
 import {
   formatDisplayDate,
   formatDisplayTime,
+  getTodayDateString,
   showSubmissionDetailFailed,
   showSubmissionsLoadFailed,
 } from '@/common'
@@ -36,7 +37,7 @@ import type {
 const items = ref<AdminSubmissionItem[]>([])
 const selectedId = ref<string | null>(null)
 const detail = ref<AdminSubmissionDetail | null>(null)
-const filterDate = ref('')
+const filterDate = ref(getTodayDateString())
 const isLoadingList = ref(false)
 const isLoadingDetail = ref(false)
 
@@ -47,7 +48,7 @@ async function loadList() {
     const data = await fetchAdminSubmissions({
       page: 1,
       limit: 50,
-      date: filterDate.value.trim() || undefined,
+      date: filterDate.value.trim(),
     })
     items.value = data.items ?? []
   } catch {
