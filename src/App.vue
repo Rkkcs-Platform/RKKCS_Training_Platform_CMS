@@ -1,7 +1,16 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import { RouterView } from 'vue-router'
+import { Toaster } from '@/components/ui/sonner'
 </script>
 
 <template>
-  <HelloWorld />
+  <RouterView />
+  <Toaster
+    position="top-center"
+    rich-colors
+    close-button
+    expand
+    :duration="3000"
+    :visible-toasts="4"
+  />
 </template>
