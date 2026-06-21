@@ -14,6 +14,7 @@ const route = useRoute()
 const tabs = [
   { label: APP_LABELS.nav.todayCodes, name: 'today-codes' },
   { label: APP_LABELS.nav.userHistory, name: 'user-history' },
+  { label: APP_LABELS.nav.setting, name: 'setting' },
 ]
 
 async function handleLogout() {
@@ -42,7 +43,7 @@ async function handleLogout() {
         </Button>
       </div>
 
-      <div class="mx-auto grid w-full max-w-5xl grid-cols-2 gap-2 px-4 pb-3 sm:px-6">
+      <div class="mx-auto grid w-full max-w-5xl grid-cols-3 gap-2 px-4 pb-3 sm:px-6">
         <RouterLink
           v-for="tab in tabs"
           :key="tab.name"
