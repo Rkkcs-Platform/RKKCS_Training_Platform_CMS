@@ -28,5 +28,6 @@ export const APP_LABELS = {
   nav: {
     todayCodes: 'Mã hôm nay',
     userHistory: 'Lịch sử user',
+    setting: 'Cài đặt'
   },
 } as const
