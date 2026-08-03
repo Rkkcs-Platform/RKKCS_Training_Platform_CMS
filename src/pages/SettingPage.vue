@@ -3,6 +3,7 @@ import { onMounted, ref } from 'vue'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
+import { Switch } from '@/components/ui/switch'
 import {
   Card,
   CardContent,
@@ -15,12 +16,19 @@ import {
   showSettingUpdateFailed,
   showSettingUpdateSuccess,
 } from '@/common'
-import { getSettingChallenge, updateSettingChallenge } from '@/services/setting.service'
+import {
+  getSettingChallenge,
+  updateSettingChallenge,
+  getMaintenanceStatus,
+  setMaintenanceMode,
+} from '@/services/setting.service'
 import { ChallengeGenerationSettings, defaultSetting } from '@/types/setting'
 
 const setting = ref<ChallengeGenerationSettings>({ ...defaultSetting })
 const isSaving = ref(false)
 const isLoading = ref(false)
+const maintenanceEnabled = ref(false)
+const isTogglingMaintenance = ref(false)
 
 const handleUpdateSetting = async () => {
   isSaving.value = true
@@ -39,10 +47,29 @@ const handleUpdateSetting = async () => {
   }
 }
 
+const handleToggleMaintenance = async (checked: boolean) => {
+  isTogglingMaintenance.value = true
+  try {
+    const result = await setMaintenanceMode(checked)
+    maintenanceEnabled.value = result.maintenance
+    showSettingUpdateSuccess()
+  } catch (error) {
+    maintenanceEnabled.value = !checked
+    showSettingUpdateFailed(getErrorMessage(error))
+  } finally {
+    isTogglingMaintenance.value = false
+  }
+}
+
 onMounted(async () => {
   isLoading.value = true
   try {
-    setting.value = await getSettingChallenge()
+    const [settingData, maintenanceData] = await Promise.all([
+      getSettingChallenge(),
+      getMaintenanceStatus(),
+    ])
+    setting.value = settingData
+    maintenanceEnabled.value = maintenanceData.maintenance
   } catch (error) {
     showSettingUpdateFailed(getErrorMessage(error))
   } finally {
@@ -53,6 +80,35 @@ onMounted(async () => {
 
 <template>
   <div class="space-y-5">
+    <Card>
+      <CardHeader>
+        <CardTitle>Chế độ bảo trì</CardTitle>
+        <CardDescription>
+          Khi bật, trang USER sẽ hiển thị màn hình bảo trì. Người dùng không thể truy cập hệ thống.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-medium">
+              {{ maintenanceEnabled ? '🔴 Đang bảo trì' : '🟢 Hoạt động bình thường' }}
+            </p>
+            <p class="mt-1 text-xs text-muted-foreground">
+              {{ maintenanceEnabled
+                ? 'Người dùng đang thấy màn hình bảo trì'
+                : 'Hệ thống đang hoạt động bình thường'
+              }}
+            </p>
+          </div>
+          <Switch
+            :model-value="maintenanceEnabled"
+            :disabled="isTogglingMaintenance || isLoading"
+            @update:model-value="handleToggleMaintenance"
+          />
+        </div>
+      </CardContent>
+    </Card>
+
     <Card>
       <CardHeader>
         <CardTitle>Cài đặt sinh mã hàng ngày</CardTitle>
