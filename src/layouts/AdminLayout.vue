@@ -12,8 +12,17 @@ const router = useRouter()
 const route = useRoute()
 
 const tabs = [
+  { label: APP_LABELS.nav.dashboard, name: 'dashboard' },
   { label: APP_LABELS.nav.todayCodes, name: 'today-codes' },
+  { label: APP_LABELS.nav.orders, name: 'orders' },
+  { label: APP_LABELS.nav.products, name: 'products' },
+  { label: APP_LABELS.nav.categories, name: 'categories' },
+  { label: APP_LABELS.nav.news, name: 'news' },
+  { label: APP_LABELS.nav.reports, name: 'reports' },
+  { label: APP_LABELS.nav.txnCodes, name: 'transaction-codes' },
   { label: APP_LABELS.nav.userHistory, name: 'user-history' },
+  { label: APP_LABELS.nav.users, name: 'users' },
+  { label: APP_LABELS.nav.shops, name: 'shops' },
   { label: APP_LABELS.nav.setting, name: 'setting' },
 ]
 
@@ -43,7 +52,7 @@ async function handleLogout() {
         </Button>
       </div>
 
-      <div class="mx-auto grid w-full max-w-5xl grid-cols-3 gap-2 px-4 pb-3 sm:px-6">
+      <div class="mx-auto grid w-full max-w-5xl grid-cols-2 gap-2 px-4 pb-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 sm:px-6">
         <RouterLink
           v-for="tab in tabs"
           :key="tab.name"

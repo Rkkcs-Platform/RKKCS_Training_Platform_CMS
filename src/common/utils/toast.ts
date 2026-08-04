@@ -56,3 +56,11 @@ export function showChallengeExportSuccess() {
 export function showChallengeExportFailed(message?: string) {
   showError(message ?? TOAST_MESSAGES.challenge.exportFailed)
 }
+
+export function showSettingUpdateSuccess() {
+  showSuccess(TOAST_MESSAGES.setting.updateSuccess)
+}
+
+export function showSettingUpdateFailed(message?: string) {
+  showError(message ?? TOAST_MESSAGES.setting.updateFailed)
+}

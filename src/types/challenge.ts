@@ -7,6 +7,8 @@ export interface ChallengeCodeItem {
 
 export interface AdminChallengeDetail {
   id: string
+  shopId?: string
+  shopCode?: string
   date: string
   totalCodes: number
   codeLength: number
@@ -18,5 +20,6 @@ export interface AdminChallengeDetail {
 
 export interface AdminChallengeNotFound {
   date: string
+  shopId?: string
   exists: false
 }

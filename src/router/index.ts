@@ -33,13 +33,58 @@ const router = createRouter({
       children: [
         {
           path: '',
+          name: 'dashboard',
+          component: () => import('@/pages/DashboardPage.vue'),
+        },
+        {
+          path: 'today-codes',
           name: 'today-codes',
           component: () => import('@/pages/TodayCodesPage.vue'),
+        },
+        {
+          path: 'orders',
+          name: 'orders',
+          component: () => import('@/pages/OrdersPage.vue'),
+        },
+        {
+          path: 'products',
+          name: 'products',
+          component: () => import('@/pages/ProductsPage.vue'),
+        },
+        {
+          path: 'categories',
+          name: 'categories',
+          component: () => import('@/pages/CategoriesPage.vue'),
+        },
+        {
+          path: 'news',
+          name: 'news',
+          component: () => import('@/pages/NewsPage.vue'),
+        },
+        {
+          path: 'reports',
+          name: 'reports',
+          component: () => import('@/pages/ReportsPage.vue'),
+        },
+        {
+          path: 'transaction-codes',
+          name: 'transaction-codes',
+          component: () => import('@/pages/TransactionCodesPage.vue'),
         },
         {
           path: 'user-history',
           name: 'user-history',
           component: () => import('@/pages/UserHistoryPage.vue'),
+        },
+        {
+          path: 'users',
+          name: 'users',
+          component: () => import('@/pages/UsersPage.vue'),
+        },
+        {
+          path: 'shops',
+          name: 'shops',
+          component: () => import('@/pages/ShopsPage.vue'),
         },
         {
           path: 'setting',
@@ -50,7 +95,7 @@ const router = createRouter({
     },
     {
       path: '/:pathMatch(.*)*',
-      redirect: { name: 'today-codes' },
+      redirect: { name: 'dashboard' },
     },
   ],
 })
@@ -70,7 +115,7 @@ router.beforeEach((to) => {
   }
 
   if (routeIsGuestOnly(to) && authStore.isAuthenticated && authStore.isAdmin) {
-    return { name: 'today-codes' }
+    return { name: 'dashboard' }
   }
 
   return true
