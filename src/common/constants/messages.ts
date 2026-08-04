@@ -1,0 +1,83 @@
+export const TOAST_MESSAGES = {
+  auth: {
+    loginSuccess: 'Đăng nhập thành công',
+    loginFailed: 'Đăng nhập thất bại. Email hoặc mật khẩu không đúng',
+    notAdmin: 'Tài khoản không có quyền admin',
+    missingCredentials: 'Vui lòng nhập email và mật khẩu',
+    logoutSuccess: 'Đăng xuất thành công',
+    sessionExpired: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại',
+  },
+  submissions: {
+    loadFailed: 'Không tải được lịch sử nhập mã',
+    detailFailed: 'Không tải được chi tiết',
+  },
+  challenge: {
+    loadFailed: 'Không tải được batch mã hôm nay',
+    notFound: 'Chưa có batch mã cho ngày hôm nay',
+    exportSuccess: 'Đã tải file CSV',
+    exportFailed: 'Export mã thất bại',
+    generateSuccess: 'Đã tạo batch mã hôm nay',
+    generateFailed: 'Generate mã thất bại',
+    regenerateSuccess: 'Đã regenerate mã',
+    lockedCannotRegenerate: 'Batch đang khóa — hãy mở khóa trước khi regenerate',
+    lockSuccess: 'Đã khóa batch — user không thể nhập mã',
+    unlockSuccess: 'Đã mở khóa batch',
+    lockFailed: 'Không đổi được trạng thái khóa',
+  },
+  users: {
+    createSuccess: 'Tạo tài khoản thành công',
+    createFailed: 'Tạo tài khoản thất bại',
+    missingFields: 'Vui lòng điền đầy đủ thông tin',
+    passwordTooShort: 'Mật khẩu tối thiểu 6 ký tự',
+  },
+  shops: {
+    loadFailed: 'Không tải được danh sách shop',
+    createSuccess: 'Đã tạo shop',
+    createFailed: 'Tạo shop thất bại',
+    updateFailed: 'Cập nhật shop thất bại',
+    missingFields: 'Vui lòng nhập shop code, tên shop và chọn user',
+    attachSuccess: 'Đã gắn shop cho user',
+    activateSuccess: 'Đã kích hoạt shop',
+    deactivateSuccess: 'Đã tạm dừng shop',
+  },
+  orders: {
+    loadFailed: 'Không tải được danh sách đơn hàng',
+    detailFailed: 'Không tải được chi tiết đơn hàng',
+    updateSuccess: 'Đã cập nhật đơn hàng',
+    updateFailed: 'Cập nhật đơn hàng thất bại',
+    reprocessSuccess: 'Đã reprocess batch thành công',
+    reprocessFailed: 'Reprocess batch thất bại',
+  },
+  products: {
+    loadFailed: 'Không tải được danh sách sản phẩm',
+    createSuccess: 'Đã tạo sản phẩm',
+    createFailed: 'Tạo sản phẩm thất bại',
+    missingFields: 'Vui lòng chọn shop và nhập mã/tên sản phẩm',
+  },
+  setting: {
+    updateSuccess: 'Đã lưu cài đặt',
+    updateFailed: 'Lưu cài đặt thất bại',
+  },
+  common: {
+    requestFailed: 'Có lỗi xảy ra. Vui lòng thử lại',
+  },
+} as const
+
+export const APP_LABELS = {
+  appName: 'RKKCS Operations',
+  adminPanel: 'Admin CMS',
+  nav: {
+    dashboard: 'Dashboard',
+    todayCodes: 'Mã hôm nay',
+    orders: 'Orders',
+    products: 'Products',
+    categories: 'Categories',
+    news: 'News',
+    reports: 'Reports',
+    txnCodes: 'Txn codes',
+    userHistory: 'Lịch sử',
+    users: 'Tạo user',
+    shops: 'Shops',
+    setting: 'Cài đặt',
+  },
+} as const
