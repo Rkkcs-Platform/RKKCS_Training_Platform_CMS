@@ -12,11 +12,16 @@ export async function updateSettingChallenge(setting: UpdateChallengeSetting) {
 }
 
 export async function getMaintenanceStatus() {
-    const { data } = await api.get<{ maintenance: boolean }>('/admin/settings/maintenance');
+    const { data } = await api.get<{ maintenance: boolean; language: string }>('/admin/settings/maintenance');
     return data;
 }
 
 export async function setMaintenanceMode(enabled: boolean) {
     const { data } = await api.patch<{ maintenance: boolean }>('/admin/settings/maintenance', { enabled });
+    return data;
+}
+
+export async function setLanguage(language: 'vi' | 'en' | 'ja') {
+    const { data } = await api.patch<{ language: string }>('/admin/settings/language', { language });
     return data;
 }

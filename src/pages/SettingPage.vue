@@ -21,6 +21,7 @@ import {
   updateSettingChallenge,
   getMaintenanceStatus,
   setMaintenanceMode,
+  setLanguage,
 } from '@/services/setting.service'
 import { ChallengeGenerationSettings, defaultSetting } from '@/types/setting'
 
@@ -29,6 +30,9 @@ const isSaving = ref(false)
 const isLoading = ref(false)
 const maintenanceEnabled = ref(false)
 const isTogglingMaintenance = ref(false)
+
+const selectedLanguage = ref<'vi' | 'en' | 'ja'>('vi')
+const isUpdatingLanguage = ref(false)
 
 const handleUpdateSetting = async () => {
   isSaving.value = true
@@ -61,6 +65,19 @@ const handleToggleMaintenance = async (checked: boolean) => {
   }
 }
 
+const handleUpdateLanguage = async (lang: 'vi' | 'en' | 'ja') => {
+  isUpdatingLanguage.value = true
+  try {
+    const result = await setLanguage(lang)
+    selectedLanguage.value = result.language as 'vi' | 'en' | 'ja'
+    showSettingUpdateSuccess()
+  } catch (error) {
+    showSettingUpdateFailed(getErrorMessage(error))
+  } finally {
+    isUpdatingLanguage.value = false
+  }
+}
+
 onMounted(async () => {
   isLoading.value = true
   try {
@@ -70,6 +87,7 @@ onMounted(async () => {
     ])
     setting.value = settingData
     maintenanceEnabled.value = maintenanceData.maintenance
+    selectedLanguage.value = (maintenanceData.language as 'vi' | 'en' | 'ja') || 'vi'
   } catch (error) {
     showSettingUpdateFailed(getErrorMessage(error))
   } finally {
@@ -105,6 +123,60 @@ onMounted(async () => {
             :disabled="isTogglingMaintenance || isLoading"
             @update:model-value="handleToggleMaintenance"
           />
+        </div>
+      </CardContent>
+    </Card>
+
+    <Card>
+      <CardHeader>
+        <CardTitle>Ngôn ngữ mặc định của ứng dụng</CardTitle>
+        <CardDescription>
+          Thiết lập ngôn ngữ hiển thị mặc định cho ứng dụng USER.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div class="flex flex-wrap gap-4">
+          <Button
+            type="button"
+            variant="outline"
+            :class="[
+              'flex items-center gap-2 h-11 px-6 border-slate-200/80 rounded-xl transition-all duration-200 shadow-sm hover:bg-slate-50 cursor-pointer',
+              selectedLanguage === 'vi' ? 'border-sky-600 bg-sky-50 text-sky-700 font-semibold ring-2 ring-sky-100 hover:bg-sky-50' : ''
+            ]"
+            :disabled="isUpdatingLanguage || isLoading"
+            @click="handleUpdateLanguage('vi')"
+          >
+            <span class="text-lg">🇻🇳</span>
+            <span>Tiếng Việt (VN)</span>
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            :class="[
+              'flex items-center gap-2 h-11 px-6 border-slate-200/80 rounded-xl transition-all duration-200 shadow-sm hover:bg-slate-50 cursor-pointer',
+              selectedLanguage === 'en' ? 'border-sky-600 bg-sky-50 text-sky-700 font-semibold ring-2 ring-sky-100 hover:bg-sky-50' : ''
+            ]"
+            :disabled="isUpdatingLanguage || isLoading"
+            @click="handleUpdateLanguage('en')"
+          >
+            <span class="text-lg">🇺🇸</span>
+            <span>English (EN)</span>
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            :class="[
+              'flex items-center gap-2 h-11 px-6 border-slate-200/80 rounded-xl transition-all duration-200 shadow-sm hover:bg-slate-50 cursor-pointer',
+              selectedLanguage === 'ja' ? 'border-sky-600 bg-sky-50 text-sky-700 font-semibold ring-2 ring-sky-100 hover:bg-sky-50' : ''
+            ]"
+            :disabled="isUpdatingLanguage || isLoading"
+            @click="handleUpdateLanguage('ja')"
+          >
+            <span class="text-lg">🇯🇵</span>
+            <span>日本語 (JP)</span>
+          </Button>
         </div>
       </CardContent>
     </Card>
