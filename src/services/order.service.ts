@@ -4,6 +4,7 @@ import type {
   AdminOrderListResponse,
   AdminProduct,
   AdminProductListResponse,
+  FillShopOrderDataResult,
   ReprocessJobResponse,
   UpdateOrderPayload,
 } from '@/types/order'
@@ -78,6 +79,14 @@ export async function updateAdminProduct(
   const { data } = await api.patch<AdminProduct>(
     `/admin/products/${id}`,
     payload,
+  )
+  return data
+}
+
+export async function fillShopOrderData(shopId?: string) {
+  const { data } = await api.post<FillShopOrderDataResult>(
+    '/admin/products/fill-all',
+    shopId ? { shopId } : {},
   )
   return data
 }

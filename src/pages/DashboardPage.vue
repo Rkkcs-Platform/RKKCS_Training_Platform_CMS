@@ -17,9 +17,9 @@ const isLoading = ref(false)
 const data = ref<AdminDashboardData | null>(null)
 
 function formatCurrency(amount: number) {
-  return new Intl.NumberFormat('vi-VN', {
+  return new Intl.NumberFormat('ja-JP', {
     style: 'currency',
-    currency: 'VND',
+    currency: 'JPY',
     maximumFractionDigits: 0,
   }).format(amount)
 }

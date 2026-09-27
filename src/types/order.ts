@@ -120,3 +120,14 @@ export interface AdminProductListResponse {
     totalPages: number
   }
 }
+
+export interface FillShopOrderDataResult {
+  shopId: string
+  shopCode: string
+  productsCreated: number
+  productsExisting: number
+  customersUpdated: number
+  ordersProductUpdated: number
+  ordersScanned: number
+  ordersFailed?: number
+}

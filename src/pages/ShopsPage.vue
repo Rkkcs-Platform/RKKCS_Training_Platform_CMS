@@ -31,9 +31,11 @@ import {
   type ShopItem,
   updateShop,
 } from '@/services/shop.service'
+import { fillShopOrderData } from '@/services/order.service'
 
 const isLoading = ref(false)
 const isSubmitting = ref(false)
+const fillingShopId = ref<string | null>(null)
 const shops = ref<ShopItem[]>([])
 const users = ref<
   Array<{
@@ -128,6 +130,21 @@ async function toggleStatus(shop: ShopItem) {
     await loadAll()
   } catch (error) {
     showError(getErrorMessage(error) || TOAST_MESSAGES.shops.updateFailed)
+  }
+}
+
+async function handleFillAll(shop: ShopItem) {
+  fillingShopId.value = shop.id
+  try {
+    const result = await fillShopOrderData(shop.id)
+    showSuccess(
+      `${TOAST_MESSAGES.products.fillSuccess} ${result.shopCode}: +${result.productsCreated} SP, ${result.customersUpdated} khách, ${result.ordersProductUpdated}/${result.ordersScanned} đơn` +
+        (result.ordersFailed ? `, lỗi ${result.ordersFailed}` : ''),
+    )
+  } catch (error) {
+    showError(getErrorMessage(error) || TOAST_MESSAGES.products.fillFailed)
+  } finally {
+    fillingShopId.value = null
   }
 }
 
@@ -229,7 +246,7 @@ onMounted(() => {
                   <TableHead>Tên</TableHead>
                   <TableHead>Owner</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead class="w-32" />
+                  <TableHead class="w-56" />
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -248,14 +265,24 @@ onMounted(() => {
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Button
-                      v-if="shop.shopCode !== 'DEFAULT'"
-                      variant="outline"
-                      size="sm"
-                      @click="toggleStatus(shop)"
-                    >
-                      {{ shop.status === 'active' ? 'Deactivate' : 'Activate' }}
-                    </Button>
+                    <div class="flex flex-wrap justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        :disabled="fillingShopId === shop.id"
+                        @click="handleFillAll(shop)"
+                      >
+                        {{ fillingShopId === shop.id ? 'Đang fill...' : 'Update All' }}
+                      </Button>
+                      <Button
+                        v-if="shop.shopCode !== 'DEFAULT'"
+                        variant="outline"
+                        size="sm"
+                        @click="toggleStatus(shop)"
+                      >
+                        {{ shop.status === 'active' ? 'Deactivate' : 'Activate' }}
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               </TableBody>
@@ -276,6 +303,24 @@ onMounted(() => {
               <p class="mt-2 text-sm text-muted-foreground">
                 Owner: {{ shop.owner?.name ?? shop.ownerId }}
               </p>
+              <div class="mt-3 flex flex-wrap gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  :disabled="fillingShopId === shop.id"
+                  @click="handleFillAll(shop)"
+                >
+                  {{ fillingShopId === shop.id ? 'Đang fill...' : 'Update All' }}
+                </Button>
+                <Button
+                  v-if="shop.shopCode !== 'DEFAULT'"
+                  variant="outline"
+                  size="sm"
+                  @click="toggleStatus(shop)"
+                >
+                  {{ shop.status === 'active' ? 'Deactivate' : 'Activate' }}
+                </Button>
+              </div>
             </div>
           </div>
         </template>
