@@ -53,6 +53,9 @@ export const TOAST_MESSAGES = {
     createSuccess: 'Đã tạo sản phẩm',
     createFailed: 'Tạo sản phẩm thất bại',
     missingFields: 'Vui lòng chọn shop và nhập mã/tên sản phẩm',
+    fillNeedShop: 'Vui lòng chọn shop trước khi Update All',
+    fillSuccess: 'Đã fill dữ liệu shop',
+    fillFailed: 'Fill dữ liệu thất bại',
   },
   setting: {
     updateSuccess: 'Đã lưu cài đặt',

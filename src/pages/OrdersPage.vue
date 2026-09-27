@@ -72,9 +72,9 @@ const shipmentStatuses: ShipmentStatus[] = [
 ]
 
 function formatCurrency(amount: number) {
-  return new Intl.NumberFormat('vi-VN', {
+  return new Intl.NumberFormat('ja-JP', {
     style: 'currency',
-    currency: 'VND',
+    currency: 'JPY',
     maximumFractionDigits: 0,
   }).format(amount)
 }
@@ -298,7 +298,7 @@ onMounted(() => {
             </div>
           <div class="space-y-2">
               <label class="text-sm font-medium">Tên người đặt hàng</label>
-              <Input v-model="form.fullName" class="h-11" placeholder="Nguyễn Văn A" />
+              <Input v-model="form.fullName" class="h-11" placeholder="佐藤 太郎" />
             </div>
             <div class="space-y-2">
               <label class="text-sm font-medium">SĐT người đặt</label>

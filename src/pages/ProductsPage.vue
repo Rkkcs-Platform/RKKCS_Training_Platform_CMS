@@ -27,6 +27,7 @@ import {
 import {
   createAdminProduct,
   fetchAdminProducts,
+  fillShopOrderData,
   updateAdminProduct,
 } from '@/services/order.service'
 import { fetchShops, type ShopItem } from '@/services/shop.service'
@@ -34,20 +35,21 @@ import type { AdminProduct } from '@/types/order'
 
 const isLoading = ref(false)
 const isSubmitting = ref(false)
+const isFilling = ref(false)
 const products = ref<AdminProduct[]>([])
 const shops = ref<ShopItem[]>([])
 const form = reactive({
   shopId: '',
   productCode: '',
   name: '',
-  price: 150000,
+  price: 2980,
   isDefault: true,
 })
 
 function formatCurrency(amount: number) {
-  return new Intl.NumberFormat('vi-VN', {
+  return new Intl.NumberFormat('ja-JP', {
     style: 'currency',
-    currency: 'VND',
+    currency: 'JPY',
     maximumFractionDigits: 0,
   }).format(amount)
 }
@@ -57,7 +59,7 @@ async function load() {
   try {
     const [shopData, productData] = await Promise.all([
       fetchShops({ page: 1, limit: 100 }),
-      fetchAdminProducts({ page: 1, limit: 100 }),
+      fetchAdminProducts({ page: 1, limit: 200 }),
     ])
     shops.value = shopData.items
     products.value = productData.items ?? []
@@ -107,6 +109,22 @@ async function handleSetDefault(product: AdminProduct) {
   }
 }
 
+async function handleFillAll() {
+  isFilling.value = true
+  try {
+    const result = await fillShopOrderData()
+    showSuccess(
+      `${TOAST_MESSAGES.products.fillSuccess} ${result.shopCode}: +${result.productsCreated} SP, ${result.customersUpdated} khách, ${result.ordersProductUpdated}/${result.ordersScanned} đơn` +
+        (result.ordersFailed ? `, lỗi ${result.ordersFailed}` : ''),
+    )
+    await load()
+  } catch (error) {
+    showError(getErrorMessage(error) || TOAST_MESSAGES.products.fillFailed)
+  } finally {
+    isFilling.value = false
+  }
+}
+
 onMounted(() => {
   void load()
 })
@@ -118,7 +136,8 @@ onMounted(() => {
       <CardHeader>
         <CardTitle>Products</CardTitle>
         <CardDescription>
-          Catalog sản phẩm theo shop. Đơn mới sẽ gắn sản phẩm mặc định.
+          Catalog Nhật theo shop. Update All gán SKU catalog cho mọi đơn đang
+          còn “Sản phẩm mặc định” (mọi shop). Cron 2h sáng làm việc tương tự.
         </CardDescription>
       </CardHeader>
       <CardContent class="space-y-4">
@@ -152,9 +171,18 @@ onMounted(() => {
           <input v-model="form.isDefault" type="checkbox" class="size-4" />
           Đặt làm mặc định khi sinh order
         </label>
-        <Button :disabled="isSubmitting" @click="handleCreate">
-          {{ isSubmitting ? 'Đang tạo...' : 'Tạo sản phẩm' }}
-        </Button>
+        <div class="flex flex-wrap gap-2">
+          <Button :disabled="isSubmitting" @click="handleCreate">
+            {{ isSubmitting ? 'Đang tạo...' : 'Tạo sản phẩm' }}
+          </Button>
+          <Button
+            variant="outline"
+            :disabled="isFilling"
+            @click="handleFillAll"
+          >
+            {{ isFilling ? 'Đang fill...' : 'Update All' }}
+          </Button>
+        </div>
       </CardContent>
     </Card>
 
