@@ -26,6 +26,9 @@ export interface AdminOrderItemLine {
   productId: string
   productCode: string
   productName: string
+  brand?: string
+  sku?: string
+  imageUrl?: string
   quantity: number
   unitPrice: number
   lineTotal: number
@@ -104,8 +107,11 @@ export interface AdminProduct {
   shopId: string
   shop?: { shopCode?: string; shopName?: string }
   productCode: string
+  sku?: string
+  brand?: string
   name: string
   description?: string
+  imageUrl?: string
   price: number
   status: string
   isDefault?: boolean
@@ -128,6 +134,8 @@ export interface FillShopOrderDataResult {
   productsExisting: number
   customersUpdated: number
   ordersProductUpdated: number
+  shipmentsUpdated?: number
+  paymentsUpdated?: number
   ordersScanned: number
   ordersFailed?: number
 }
