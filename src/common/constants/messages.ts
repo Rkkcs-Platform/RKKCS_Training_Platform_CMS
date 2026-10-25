@@ -71,7 +71,7 @@ export const APP_LABELS = {
   adminPanel: 'Admin CMS',
   nav: {
     dashboard: 'Dashboard',
-    todayCodes: 'Mã hôm nay',
+    todayCodes: 'Phiếu hôm nay',
     orders: 'Orders',
     products: 'Products',
     categories: 'Categories',
