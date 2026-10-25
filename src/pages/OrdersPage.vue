@@ -273,26 +273,10 @@ onMounted(() => {
             <div
               v-for="line in detail.items"
               :key="line.id"
-              class="flex items-center justify-between gap-3 rounded-lg border px-3 py-2 text-sm"
+              class="flex justify-between rounded-lg border px-3 py-2 text-sm"
             >
-              <div class="flex min-w-0 items-center gap-3">
-                <img
-                  v-if="line.imageUrl"
-                  :src="line.imageUrl"
-                  :alt="line.productName"
-                  class="size-10 shrink-0 rounded-md object-cover"
-                />
-                <div class="min-w-0">
-                  <p v-if="line.brand" class="text-xs text-muted-foreground">
-                    {{ line.brand }}
-                  </p>
-                  <p>{{ line.productName }} × {{ line.quantity }}</p>
-                  <p class="text-xs text-muted-foreground">
-                    {{ line.sku || line.productCode }}
-                  </p>
-                </div>
-              </div>
-              <span class="shrink-0">{{ formatCurrency(line.lineTotal) }} 税込</span>
+              <span>{{ line.productName }} × {{ line.quantity }}</span>
+              <span>{{ formatCurrency(line.lineTotal) }}</span>
             </div>
           </div>
 

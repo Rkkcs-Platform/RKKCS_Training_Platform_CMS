@@ -138,7 +138,7 @@ async function handleFillAll(shop: ShopItem) {
   try {
     const result = await fillShopOrderData(shop.id)
     showSuccess(
-      `${TOAST_MESSAGES.products.fillSuccess} ${result.shopCode}: +${result.productsCreated} SP, ${result.customersUpdated} khách, ${result.ordersProductUpdated}/${result.ordersScanned} đơn, ${result.shipmentsUpdated ?? 0} vận đơn` +
+      `${TOAST_MESSAGES.products.fillSuccess} ${result.shopCode}: +${result.productsCreated} SP, ${result.customersUpdated} khách, ${result.ordersProductUpdated}/${result.ordersScanned} đơn` +
         (result.ordersFailed ? `, lỗi ${result.ordersFailed}` : ''),
     )
   } catch (error) {

@@ -114,7 +114,7 @@ async function handleFillAll() {
   try {
     const result = await fillShopOrderData()
     showSuccess(
-      `${TOAST_MESSAGES.products.fillSuccess} ${result.shopCode}: +${result.productsCreated} SP, ${result.customersUpdated} khách, ${result.ordersProductUpdated}/${result.ordersScanned} đơn, ${result.shipmentsUpdated ?? 0} vận đơn` +
+      `${TOAST_MESSAGES.products.fillSuccess} ${result.shopCode}: +${result.productsCreated} SP, ${result.customersUpdated} khách, ${result.ordersProductUpdated}/${result.ordersScanned} đơn` +
         (result.ordersFailed ? `, lỗi ${result.ordersFailed}` : ''),
     )
     await load()
@@ -136,8 +136,8 @@ onMounted(() => {
       <CardHeader>
         <CardTitle>Products</CardTitle>
         <CardDescription>
-          Catalog Nhật (ảnh, brand, SKU, 税込). Update All gán 2–3 SKU, địa chỉ
-          〒 và Yamato/Sagawa cho đơn stub. Cron 2h sáng làm việc tương tự.
+          Catalog Nhật theo shop. Update All gán SKU catalog cho mọi đơn đang
+          còn “Sản phẩm mặc định” (mọi shop). Cron 2h sáng làm việc tương tự.
         </CardDescription>
       </CardHeader>
       <CardContent class="space-y-4">
@@ -196,36 +196,22 @@ onMounted(() => {
           v-else-if="!products.length"
           class="rounded-xl border border-dashed p-8 text-center text-muted-foreground"
         >
-          Chưa có sản phẩm catalog. Bấm Update All để tạo SKU Nhật.
+          Chưa có sản phẩm — hệ thống sẽ tự tạo DEFAULT khi sinh đơn
         </div>
         <div v-else class="overflow-hidden rounded-xl border">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Ảnh</TableHead>
-                <TableHead>Brand</TableHead>
-                <TableHead>SKU</TableHead>
                 <TableHead>Code</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Shop</TableHead>
-                <TableHead>Price (税込)</TableHead>
+                <TableHead>Price</TableHead>
                 <TableHead>Default</TableHead>
                 <TableHead />
               </TableRow>
             </TableHeader>
             <TableBody>
               <TableRow v-for="product in products" :key="product.id">
-                <TableCell>
-                  <img
-                    v-if="product.imageUrl"
-                    :src="product.imageUrl"
-                    :alt="product.name"
-                    class="size-10 rounded-md object-cover"
-                  />
-                  <span v-else class="text-muted-foreground">—</span>
-                </TableCell>
-                <TableCell>{{ product.brand || '—' }}</TableCell>
-                <TableCell class="font-mono text-xs">{{ product.sku || '—' }}</TableCell>
                 <TableCell class="font-mono">{{ product.productCode }}</TableCell>
                 <TableCell>{{ product.name }}</TableCell>
                 <TableCell>{{ product.shop?.shopCode || '—' }}</TableCell>
