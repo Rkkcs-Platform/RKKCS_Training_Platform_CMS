@@ -112,7 +112,7 @@ async function handleExport() {
 
 async function handleGenerate() {
   if (!selectedShopId.value) {
-    showError('Chọn shop trước khi generate')
+    showError('Chọn cửa hàng trước khi tạo phiếu')
     return
   }
 
@@ -197,11 +197,11 @@ onMounted(async () => {
     <Card>
       <CardHeader class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <CardTitle>Mã code hôm nay</CardTitle>
+          <CardTitle>Phiếu hôm nay</CardTitle>
           <CardDescription>
-            {{ formatDisplayDate(today) }} · {{ today }}
-            <span v-if="selectedShop" class="block mt-1">
-              Shop: <strong>{{ selectedShop.shopCode }}</strong> — {{ selectedShop.shopName }}
+            Mã đưa cho nhân viên nhập trong ngày · {{ formatDisplayDate(today) }}
+            <span v-if="selectedShop" class="mt-1 block">
+              {{ selectedShop.shopName }} · {{ selectedShop.shopCode }}
             </span>
           </CardDescription>
         </div>
@@ -212,73 +212,31 @@ onMounted(async () => {
             Tải lại
           </Button>
           <Button
-            variant="outline"
-            size="sm"
-            :disabled="isGenerating || challenge?.status === 'locked' || !selectedShopId"
-            @click="handleGenerate"
-          >
-            <Sparkles class="size-4" />
-            {{
-              isGenerating
-                ? 'Đang tạo...'
-                : challenge
-                  ? 'Regenerate'
-                  : 'Generate'
-            }}
-          </Button>
-          <Button
-            v-if="challenge"
-            variant="outline"
-            size="sm"
-            :disabled="isTogglingLock"
-            @click="handleToggleLock"
-          >
-            <Unlock v-if="challenge.status === 'locked'" class="size-4" />
-            <Lock v-else class="size-4" />
-            {{
-              isTogglingLock
-                ? '...'
-                : challenge.status === 'locked'
-                  ? 'Mở khóa'
-                  : 'Khóa'
-            }}
-          </Button>
-          <Button
-            v-if="challenge"
-            variant="outline"
-            size="sm"
-            :disabled="isReprocessing"
-            @click="handleReprocess"
-          >
-            <RotateCcw class="size-4" :class="cn(isReprocessing && 'animate-spin')" />
-            {{ isReprocessing ? 'Reprocess...' : 'Reprocess orders' }}
-          </Button>
-          <Button
             size="sm"
             :disabled="!challenge || isExporting"
             @click="handleExport"
           >
             <Download class="size-4" />
-            {{ isExporting ? 'Đang export...' : 'Export CSV' }}
+            {{ isExporting ? 'Đang tải...' : 'Tải danh sách mã' }}
           </Button>
         </div>
       </CardHeader>
 
       <CardContent class="space-y-4">
         <div class="space-y-2">
-          <label class="text-sm font-medium" for="shop-select">Shop (quan trọng)</label>
+          <label class="text-sm font-medium" for="shop-select">Cửa hàng</label>
           <select
             id="shop-select"
             v-model="selectedShopId"
             class="flex h-11 w-full rounded-lg border border-input bg-background px-3 text-sm"
           >
-            <option disabled value="">Chọn shop</option>
+            <option disabled value="">Chọn cửa hàng</option>
             <option v-for="shop in shops" :key="shop.id" :value="shop.id">
-              {{ shop.shopCode }} — {{ shop.shopName }}
+              {{ shop.shopName }} — {{ shop.shopCode }}
             </option>
           </select>
           <p class="text-xs text-muted-foreground">
-            User chỉ khớp mã của <strong>đúng shop</strong> họ được gắn. Copy mã từ shop khác sẽ báo không tìm thấy.
+            Nhân viên chỉ nhận được mã của cửa hàng mình.
           </p>
         </div>
 
@@ -296,7 +254,7 @@ onMounted(async () => {
           </p>
           <Button class="mt-4" :disabled="isGenerating" @click="handleGenerate">
             <Sparkles class="size-4" />
-            {{ isGenerating ? 'Đang tạo...' : 'Generate mã cho shop này' }}
+            {{ isGenerating ? 'Đang tạo...' : 'Tạo phiếu hôm nay' }}
           </Button>
         </div>
 
@@ -309,7 +267,7 @@ onMounted(async () => {
               {{ challenge.shopCode ?? 'Shop' }}
             </Badge>
             <span class="text-muted-foreground">
-              {{ challenge.totalCodes }} mã · độ dài {{ challenge.codeLength }}
+              {{ challenge.totalCodes }} mã trên phiếu
             </span>
           </div>
 
@@ -345,6 +303,56 @@ onMounted(async () => {
             </Table>
           </div>
         </template>
+      </CardContent>
+    </Card>
+
+    <Card v-if="selectedShopId">
+      <CardHeader>
+        <CardTitle>Quản trị</CardTitle>
+        <CardDescription>
+          Tạo lại phiếu, khóa phiếu, hoặc tạo lại đơn. Không cần khi chỉ in mã cho nhân viên.
+        </CardDescription>
+      </CardHeader>
+      <CardContent class="flex flex-wrap gap-2">
+        <Button
+          variant="outline"
+          :disabled="isGenerating || challenge?.status === 'locked'"
+          @click="handleGenerate"
+        >
+          <Sparkles class="size-4" />
+          {{
+            isGenerating
+              ? 'Đang tạo...'
+              : challenge
+                ? 'Tạo lại phiếu'
+                : 'Tạo phiếu'
+          }}
+        </Button>
+        <Button
+          v-if="challenge"
+          variant="outline"
+          :disabled="isTogglingLock"
+          @click="handleToggleLock"
+        >
+          <Unlock v-if="challenge.status === 'locked'" class="size-4" />
+          <Lock v-else class="size-4" />
+          {{
+            isTogglingLock
+              ? 'Đang lưu...'
+              : challenge.status === 'locked'
+                ? 'Mở khóa phiếu'
+                : 'Khóa phiếu'
+          }}
+        </Button>
+        <Button
+          v-if="challenge"
+          variant="outline"
+          :disabled="isReprocessing"
+          @click="handleReprocess"
+        >
+          <RotateCcw class="size-4" :class="cn(isReprocessing && 'animate-spin')" />
+          {{ isReprocessing ? 'Đang chạy...' : 'Tạo lại đơn từ phiếu' }}
+        </Button>
       </CardContent>
     </Card>
   </div>
