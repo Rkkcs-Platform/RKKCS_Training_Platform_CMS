@@ -59,6 +59,9 @@ export async function createAdminProduct(payload: {
   productCode: string
   name: string
   price: number
+  brand?: string
+  sku?: string
+  imageUrl?: string
   description?: string
   isDefault?: boolean
 }) {
@@ -70,6 +73,9 @@ export async function updateAdminProduct(
   id: string,
   payload: Partial<{
     name: string
+    brand: string
+    sku: string
+    imageUrl: string
     price: number
     description: string
     status: string
