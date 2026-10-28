@@ -52,6 +52,8 @@ export const TOAST_MESSAGES = {
     loadFailed: 'Không tải được danh sách sản phẩm',
     createSuccess: 'Đã tạo sản phẩm',
     createFailed: 'Tạo sản phẩm thất bại',
+    updateSuccess: 'Đã cập nhật sản phẩm',
+    updateFailed: 'Cập nhật sản phẩm thất bại',
     missingFields: 'Vui lòng chọn shop và nhập mã/tên sản phẩm',
     fillNeedShop: 'Vui lòng chọn shop trước khi Update All',
     fillSuccess: 'Đã fill dữ liệu shop',

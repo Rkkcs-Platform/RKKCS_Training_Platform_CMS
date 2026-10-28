@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { Input } from '@/components/ui/input'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/card'
 import {
   getErrorMessage,
+  showError,
   showSettingUpdateFailed,
   showSettingUpdateSuccess,
 } from '@/common'
@@ -29,10 +30,37 @@ const setting = ref<ChallengeGenerationSettings>({ ...defaultSetting })
 const isSaving = ref(false)
 const isLoading = ref(false)
 const maintenanceEnabled = ref(false)
+const maintenanceUntil = ref<string | null>(null)
+const maintenanceUntilTime = ref('')
 const isTogglingMaintenance = ref(false)
 
 const selectedLanguage = ref<'vi' | 'en' | 'ja'>('vi')
 const isUpdatingLanguage = ref(false)
+
+const maintenanceUntilLabel = computed(() => {
+  if (!maintenanceUntil.value) return null
+  const date = new Date(maintenanceUntil.value)
+  if (Number.isNaN(date.getTime())) return null
+  return date.toLocaleTimeString('vi-VN', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  })
+})
+
+function defaultUntilTime() {
+  const next = new Date()
+  next.setMinutes(0, 0, 0)
+  next.setHours(next.getHours() + 1)
+  return `${String(next.getHours()).padStart(2, '0')}:${String(next.getMinutes()).padStart(2, '0')}`
+}
+
+function timeFromIso(iso: string | null) {
+  if (!iso) return defaultUntilTime()
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) return defaultUntilTime()
+  return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`
+}
 
 const handleUpdateSetting = async () => {
   isSaving.value = true
@@ -51,14 +79,48 @@ const handleUpdateSetting = async () => {
   }
 }
 
+const applyMaintenanceResult = (result: {
+  maintenance: boolean
+  until: string | null
+}) => {
+  maintenanceEnabled.value = result.maintenance
+  maintenanceUntil.value = result.until
+  maintenanceUntilTime.value = timeFromIso(result.until)
+}
+
 const handleToggleMaintenance = async (checked: boolean) => {
+  if (checked && !maintenanceUntilTime.value) {
+    showError('Chọn giờ mở lại hệ thống trước khi bật')
+    return
+  }
+
   isTogglingMaintenance.value = true
   try {
-    const result = await setMaintenanceMode(checked)
-    maintenanceEnabled.value = result.maintenance
+    const result = await setMaintenanceMode(
+      checked,
+      checked ? maintenanceUntilTime.value : undefined,
+    )
+    applyMaintenanceResult(result)
     showSettingUpdateSuccess()
   } catch (error) {
-    maintenanceEnabled.value = !checked
+    showSettingUpdateFailed(getErrorMessage(error))
+  } finally {
+    isTogglingMaintenance.value = false
+  }
+}
+
+const handleUpdateMaintenanceUntil = async () => {
+  if (!maintenanceUntilTime.value) {
+    showError('Chọn giờ mở lại hệ thống')
+    return
+  }
+
+  isTogglingMaintenance.value = true
+  try {
+    const result = await setMaintenanceMode(true, maintenanceUntilTime.value)
+    applyMaintenanceResult(result)
+    showSettingUpdateSuccess()
+  } catch (error) {
     showSettingUpdateFailed(getErrorMessage(error))
   } finally {
     isTogglingMaintenance.value = false
@@ -86,7 +148,7 @@ onMounted(async () => {
       getMaintenanceStatus(),
     ])
     setting.value = settingData
-    maintenanceEnabled.value = maintenanceData.maintenance
+    applyMaintenanceResult(maintenanceData)
     selectedLanguage.value = (maintenanceData.language as 'vi' | 'en' | 'ja') || 'vi'
   } catch (error) {
     showSettingUpdateFailed(getErrorMessage(error))
@@ -100,22 +162,27 @@ onMounted(async () => {
   <div class="space-y-5">
     <Card>
       <CardHeader>
-        <CardTitle>Chế độ bảo trì</CardTitle>
+        <CardTitle>Tạm dừng hệ thống</CardTitle>
         <CardDescription>
-          Khi bật, trang USER sẽ hiển thị màn hình bảo trì. Người dùng không thể truy cập hệ thống.
+          Khi bật, trang USER báo hệ thống đang cập nhật đến giờ bạn chọn trong hôm nay. Đến giờ đó hệ thống tự mở lại.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div class="flex items-center justify-between">
+      <CardContent class="space-y-4">
+        <div class="flex items-center justify-between gap-4">
           <div>
             <p class="text-sm font-medium">
-              {{ maintenanceEnabled ? '🔴 Đang bảo trì' : '🟢 Hoạt động bình thường' }}
+              {{ maintenanceEnabled ? 'Đang tạm dừng' : 'Hoạt động bình thường' }}
             </p>
             <p class="mt-1 text-xs text-muted-foreground">
-              {{ maintenanceEnabled
-                ? 'Người dùng đang thấy màn hình bảo trì'
-                : 'Hệ thống đang hoạt động bình thường'
-              }}
+              <template v-if="maintenanceEnabled && maintenanceUntilLabel">
+                Dự kiến hoạt động trở lại lúc {{ maintenanceUntilLabel }} hôm nay
+              </template>
+              <template v-else-if="maintenanceEnabled">
+                Người dùng đang thấy thông báo tạm dừng hệ thống
+              </template>
+              <template v-else>
+                Hệ thống đang hoạt động bình thường
+              </template>
             </p>
           </div>
           <Switch
@@ -123,6 +190,34 @@ onMounted(async () => {
             :disabled="isTogglingMaintenance || isLoading"
             @update:model-value="handleToggleMaintenance"
           />
+        </div>
+
+        <div class="rounded-xl border bg-muted/30 p-4">
+          <label class="text-sm font-medium" for="maintenance-until">
+            Mở lại lúc (hôm nay)
+          </label>
+          <p class="mt-1 text-xs text-muted-foreground">
+            Ví dụ chọn 15:00 thì hệ thống tự mở lại lúc 15:00 hôm nay.
+          </p>
+          <div class="mt-3 flex flex-wrap items-center gap-3">
+            <Input
+              id="maintenance-until"
+              v-model="maintenanceUntilTime"
+              type="time"
+              class="h-11 w-40"
+              :disabled="isTogglingMaintenance || isLoading"
+            />
+            <Button
+              v-if="maintenanceEnabled"
+              type="button"
+              variant="outline"
+              class="h-11"
+              :disabled="isTogglingMaintenance || isLoading || !maintenanceUntilTime"
+              @click="handleUpdateMaintenanceUntil"
+            >
+              Cập nhật giờ
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>
