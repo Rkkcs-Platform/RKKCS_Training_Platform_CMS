@@ -22,10 +22,15 @@ export async function getMaintenanceStatus() {
     return data;
 }
 
-export async function setMaintenanceMode(enabled: boolean, until?: string) {
+export async function setMaintenanceMode(
+  enabled: boolean,
+  until?: string,
+  untilDate?: string,
+) {
     const { data } = await api.patch<MaintenanceStatus>('/admin/settings/maintenance', {
       enabled,
       ...(enabled && until ? { until } : {}),
+      ...(enabled && untilDate ? { untilDate } : {}),
     });
     return data;
 }
