@@ -24,3 +24,14 @@ export async function fetchAdminSubmissionById(submissionId: string) {
   )
   return data
 }
+
+export async function deleteAdminSubmissionAnswers(
+  submissionId: string,
+  orders: number[],
+) {
+  const { data } = await api.post<AdminSubmissionDetail>(
+    `/admin/submissions/${submissionId}/answers/delete`,
+    { orders },
+  )
+  return data
+}

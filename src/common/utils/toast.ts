@@ -45,6 +45,14 @@ export function showSubmissionDetailFailed() {
   showError(TOAST_MESSAGES.submissions.detailFailed)
 }
 
+export function showSubmissionAnswerDeleted() {
+  showSuccess(TOAST_MESSAGES.submissions.deleteSuccess)
+}
+
+export function showSubmissionAnswerDeleteFailed(message?: string) {
+  showError(message ?? TOAST_MESSAGES.submissions.deleteFailed)
+}
+
 export function showChallengeLoadFailed() {
   showError(TOAST_MESSAGES.challenge.loadFailed)
 }

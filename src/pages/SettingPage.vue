@@ -31,6 +31,7 @@ const isSaving = ref(false)
 const isLoading = ref(false)
 const maintenanceEnabled = ref(false)
 const maintenanceUntil = ref<string | null>(null)
+const maintenanceUntilDate = ref('')
 const maintenanceUntilTime = ref('')
 const isTogglingMaintenance = ref(false)
 
@@ -41,18 +42,35 @@ const maintenanceUntilLabel = computed(() => {
   if (!maintenanceUntil.value) return null
   const date = new Date(maintenanceUntil.value)
   if (Number.isNaN(date.getTime())) return null
-  return date.toLocaleTimeString('vi-VN', {
+  return date.toLocaleString('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
     hour12: false,
   })
 })
 
+function defaultUntilDate() {
+  const next = new Date()
+  next.setMinutes(0, 0, 0)
+  next.setHours(next.getHours() + 1)
+  return `${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, '0')}-${String(next.getDate()).padStart(2, '0')}`
+}
+
 function defaultUntilTime() {
   const next = new Date()
   next.setMinutes(0, 0, 0)
   next.setHours(next.getHours() + 1)
   return `${String(next.getHours()).padStart(2, '0')}:${String(next.getMinutes()).padStart(2, '0')}`
+}
+
+function dateFromIso(iso: string | null) {
+  if (!iso) return defaultUntilDate()
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) return defaultUntilDate()
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 }
 
 function timeFromIso(iso: string | null) {
@@ -85,12 +103,13 @@ const applyMaintenanceResult = (result: {
 }) => {
   maintenanceEnabled.value = result.maintenance
   maintenanceUntil.value = result.until
+  maintenanceUntilDate.value = dateFromIso(result.until)
   maintenanceUntilTime.value = timeFromIso(result.until)
 }
 
 const handleToggleMaintenance = async (checked: boolean) => {
-  if (checked && !maintenanceUntilTime.value) {
-    showError('Chọn giờ mở lại hệ thống trước khi bật')
+  if (checked && (!maintenanceUntilDate.value || !maintenanceUntilTime.value)) {
+    showError('Chọn ngày và giờ mở lại hệ thống trước khi bật')
     return
   }
 
@@ -99,6 +118,7 @@ const handleToggleMaintenance = async (checked: boolean) => {
     const result = await setMaintenanceMode(
       checked,
       checked ? maintenanceUntilTime.value : undefined,
+      checked ? maintenanceUntilDate.value : undefined,
     )
     applyMaintenanceResult(result)
     showSettingUpdateSuccess()
@@ -110,14 +130,18 @@ const handleToggleMaintenance = async (checked: boolean) => {
 }
 
 const handleUpdateMaintenanceUntil = async () => {
-  if (!maintenanceUntilTime.value) {
-    showError('Chọn giờ mở lại hệ thống')
+  if (!maintenanceUntilDate.value || !maintenanceUntilTime.value) {
+    showError('Chọn ngày và giờ mở lại hệ thống')
     return
   }
 
   isTogglingMaintenance.value = true
   try {
-    const result = await setMaintenanceMode(true, maintenanceUntilTime.value)
+    const result = await setMaintenanceMode(
+      true,
+      maintenanceUntilTime.value,
+      maintenanceUntilDate.value,
+    )
     applyMaintenanceResult(result)
     showSettingUpdateSuccess()
   } catch (error) {
@@ -164,7 +188,7 @@ onMounted(async () => {
       <CardHeader>
         <CardTitle>Tạm dừng hệ thống</CardTitle>
         <CardDescription>
-          Khi bật, trang USER báo hệ thống đang cập nhật đến giờ bạn chọn trong hôm nay. Đến giờ đó hệ thống tự mở lại.
+          Khi bật, trang USER báo hệ thống đang cập nhật đến ngày giờ bạn chọn. Đến thời điểm đó hệ thống tự mở lại.
         </CardDescription>
       </CardHeader>
       <CardContent class="space-y-4">
@@ -175,7 +199,7 @@ onMounted(async () => {
             </p>
             <p class="mt-1 text-xs text-muted-foreground">
               <template v-if="maintenanceEnabled && maintenanceUntilLabel">
-                Dự kiến hoạt động trở lại lúc {{ maintenanceUntilLabel }} hôm nay
+                Dự kiến hoạt động trở lại lúc {{ maintenanceUntilLabel }}
               </template>
               <template v-else-if="maintenanceEnabled">
                 Người dùng đang thấy thông báo tạm dừng hệ thống
@@ -193,15 +217,20 @@ onMounted(async () => {
         </div>
 
         <div class="rounded-xl border bg-muted/30 p-4">
-          <label class="text-sm font-medium" for="maintenance-until">
-            Mở lại lúc (hôm nay)
-          </label>
+          <p class="text-sm font-medium">Mở lại lúc</p>
           <p class="mt-1 text-xs text-muted-foreground">
-            Ví dụ chọn 15:00 thì hệ thống tự mở lại lúc 15:00 hôm nay.
+            Chọn ngày và giờ. Ví dụ 05/11 lúc 15:00 thì hệ thống tự mở lại đúng thời điểm đó.
           </p>
           <div class="mt-3 flex flex-wrap items-center gap-3">
             <Input
-              id="maintenance-until"
+              id="maintenance-until-date"
+              v-model="maintenanceUntilDate"
+              type="date"
+              class="h-11 w-44"
+              :disabled="isTogglingMaintenance || isLoading"
+            />
+            <Input
+              id="maintenance-until-time"
               v-model="maintenanceUntilTime"
               type="time"
               class="h-11 w-40"
@@ -212,10 +241,10 @@ onMounted(async () => {
               type="button"
               variant="outline"
               class="h-11"
-              :disabled="isTogglingMaintenance || isLoading || !maintenanceUntilTime"
+              :disabled="isTogglingMaintenance || isLoading || !maintenanceUntilDate || !maintenanceUntilTime"
               @click="handleUpdateMaintenanceUntil"
             >
-              Cập nhật giờ
+              Cập nhật thời gian
             </Button>
           </div>
         </div>

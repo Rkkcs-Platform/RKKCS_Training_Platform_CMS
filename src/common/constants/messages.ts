@@ -10,6 +10,10 @@ export const TOAST_MESSAGES = {
   submissions: {
     loadFailed: 'Không tải được lịch sử nhập mã',
     detailFailed: 'Không tải được chi tiết',
+    deleteSuccess: 'Đã xóa mã đã nhập',
+    deleteFailed: 'Xóa mã thất bại',
+    deleteConfirm: 'Xóa mã này khỏi lịch sử nhập của user?',
+    deleteMultiConfirm: 'Xóa {count} mã đã chọn khỏi lịch sử nhập của user?',
   },
   challenge: {
     loadFailed: 'Không tải được batch mã hôm nay',
