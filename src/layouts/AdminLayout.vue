@@ -6,6 +6,7 @@ import { showLogoutSuccess } from '@/common'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/stores/auth'
+import logoUrl from '@/assets/logo.png'
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -37,13 +38,20 @@ async function handleLogout() {
   <div class="min-h-svh bg-background">
     <header class="sticky top-0 z-10 border-b bg-background/95 backdrop-blur">
       <div class="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
-        <div class="min-w-0">
-          <p class="text-xs font-medium uppercase tracking-[0.2em] text-primary">
-            {{ APP_LABELS.adminPanel }}
-          </p>
-          <p class="truncate text-sm font-semibold sm:text-base">
-            {{ authStore.user?.name }}
-          </p>
+        <div class="flex min-w-0 items-center gap-3">
+          <img
+            :src="logoUrl"
+            alt="RKK CSJ"
+            class="h-8 w-auto max-w-[140px] object-contain"
+          />
+          <div class="min-w-0">
+            <p class="text-xs font-medium uppercase tracking-[0.2em] text-primary">
+              {{ APP_LABELS.adminPanel }}
+            </p>
+            <p class="truncate text-sm font-semibold sm:text-base">
+              {{ authStore.user?.name }}
+            </p>
+          </div>
         </div>
 
         <Button variant="outline" size="sm" @click="handleLogout">

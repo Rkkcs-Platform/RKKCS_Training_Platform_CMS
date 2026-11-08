@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { useAuthStore } from '@/stores/auth'
+import logoUrl from '@/assets/logo.png'
 
 const authStore = useAuthStore()
 const router = useRouter()
@@ -70,10 +71,12 @@ async function handleSubmit() {
   <div class="flex min-h-svh items-center justify-center bg-background px-4 py-8">
     <div class="w-full max-w-md space-y-6">
       <div class="text-center">
-        <p class="text-xs font-medium uppercase tracking-[0.25em] text-primary">
-          RKKCS
-        </p>
-        <h1 class="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+        <img
+          :src="logoUrl"
+          alt="RKK CSJ"
+          class="mx-auto h-14 w-auto max-w-[240px] object-contain sm:h-16"
+        />
+        <h1 class="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">
           {{ APP_LABELS.appName }}
         </h1>
         <p class="mt-2 text-sm text-muted-foreground sm:text-base">
