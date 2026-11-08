@@ -73,7 +73,7 @@ export const TOAST_MESSAGES = {
 } as const
 
 export const APP_LABELS = {
-  appName: 'RKKCS Operations',
+  appName: 'RKK CSJ Operations',
   adminPanel: 'Admin CMS',
   nav: {
     dashboard: 'Dashboard',
